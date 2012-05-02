@@ -1,0 +1,37 @@
+start =
+    expression
+
+expression =
+    atom
+ /  expressionlist
+ 
+validchar
+    = [0-9a-zA-Z_?!+\-=@#$%^&*/.]
+
+atom =
+    chars:validchar+
+        { return chars.join(""); }
+        
+expressionlist = 
+    open_par first:expression rest:(space expression)+ close_par
+		{
+		var array = [];
+		array.push(first);
+		if(rest != null){    	
+			for(var i = 0;i < rest.length; i++){
+				array.push(rest[i][1]);
+			}
+		}
+		return array;
+		}
+
+open_par =
+    '('
+
+close_par =
+    ')'
+space =
+     ' '
+	 
+	 
+	 

@@ -1,0 +1,51 @@
+start =
+    program
+
+validchar
+    = [0-9a-zA-Z_?!+\-=@#$%^&*/.]
+
+atom = chars:validchar+
+       { return chars.join(""); }
+
+space = ' ' / '\n' / '\r'  / '\t'
+
+program =  nonCodeBlock? ex:expression nonCodeBlock? endcomment?
+    {return ex}
+
+expression = (qoutedExpression / unquotedExpression) 
+
+qoutedExpression = "'" space* ex:expression
+     {return ['qoute', ex];}
+
+unquotedExpression = emptyList / expressionList / atom
+
+emptyList = '(' space* ')'
+        {return []}
+
+spaceExpression = nonCodeBlock ex:expression 
+        {return ex;}
+
+
+expressionList = '(' nonCodeBlock? first:expression rest:spaceExpression* nonCodeBlock? ')'
+        { return [first].concat(rest);}
+
+comment = ';;' chars:[^\n]* '\n'
+        {return ''}
+
+spaces = space+
+
+nonCodeBlock = nonCodeBlockStart nonCodeLine* spaceAtStartLine?
+          {return '';}
+
+
+nonCodeBlockStart = comment / space+
+
+nonCodeLine = comment / spaceLine / (spaceAtStartLine  comment)
+
+spaceLine = (' ' / '\r' / '\t')* '\n'
+
+spaceAtStartLine = (' ' / '\r' / '\t')*
+
+endcomment = ';;' [^\n]*
+        {return ''}
+
