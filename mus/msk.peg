@@ -1,0 +1,42 @@
+start =
+    sequence
+
+sequence=
+    left:parallel " " right:sequence
+        { return {tag: "seq", left:left, right:right}; }
+  / parallel 
+    
+
+parallel =
+    left:repeat "=" right:parallel 
+        { return {tag: "par", left:left, right:right}; }
+  / repeat
+
+repeat = '[' sequence:sequence ']' duration:duration 
+        { return {tag: "repeat", section:sequence , count:duration}; }
+ / recursion
+
+
+recursion=
+    sound
+  / "(" sequence:sequence")"
+      { return sequence; }
+
+note = pitch:pitch 'x' duration:duration
+{return {tag : 'note', pitch:pitch, dur: duration}}
+
+pitch = 'a0' 
+      / 'b0' 
+      / a:[a-g] b:[1-7] 
+       {return a + b}
+      / 'c8'
+
+rest = 'shx' duration:duration
+{return {tag : 'rest', dur: duration}}
+
+sound = note / rest
+
+
+duration = first:[1-9] rest:[0-9]*
+{return Number(first + rest.join(''))}
+
