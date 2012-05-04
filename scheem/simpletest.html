@@ -546,7 +546,7 @@ suite('minor', function(){
 	});	
 });
 
-suite('parse', function() {
+suite('parser smoke test', function() {
     test('a number', function() {
         assert.deepEqual(
             SCHEEM.parse('42'),
@@ -559,6 +559,107 @@ suite('parse', function() {
             'x'
         );
     });
+});
+
+suite('parser basic tests', function() {
+    test('parse("atom")', function() {
+		assert.deepEqual(SCHEEM.parse("atom"), "atom");
+    });
+    test('parse("+")', function() {
+		assert.deepEqual(SCHEEM.parse("+"), "+");
+    });	
+    test('parse("(+ x 3)")', function() {
+		assert.deepEqual(SCHEEM.parse("(+ x 3)"), ["+", "x",  3]);
+    });		
+    test('parse("(+ 1 (f x 3 y))")', function() {
+		assert.deepEqual(SCHEEM.parse("(+ 1 (f x 3 y))"), ["+", 1, ["f", "x", 3, "y"]]);	
+    });		
+});
+
+suite('parser spaces between atoms', function() {
+    test('parse("(+    x     3)")', function() {
+		assert.deepEqual(SCHEEM.parse("(+   x    3)"), ["+", "x", 3]);
+    });
+    test('parse("(   +    x    3)")', function() {
+		assert.deepEqual(SCHEEM.parse("(    +   x    3)"), ["+", "x", 3]);
+    });	
+    test('parse("(   +    x    3   )")', function() {
+		assert.deepEqual(SCHEEM.parse("(    +   x    3    )"), ["+", "x", 3]);
+    });		
+    test('parse("  (  +   1   (  f   x   3   y  )  )")', function() {
+		assert.deepEqual(SCHEEM.parse("(  +   1   (   f    x    3     y  )   )"), ["+", 1, ["f", "x", 3, "y"]]);
+    });		
+});
+
+suite('parser enters and tabs', function() {
+    test('parse("(+ \n   x  \t   3)")', function() {
+		assert.deepEqual(SCHEEM.parse("(+  \n x \t   3)"), ["+", "x", 3]);
+    });
+    test('parse("(  \r\n +    x    3)")', function() {
+		assert.deepEqual(SCHEEM.parse("(  \r\n  + \t  x \r\n   3)"), ["+", "x", 3]);
+    });	
+    test('parse("(   +    x    3   )")', function() {
+		assert.deepEqual(SCHEEM.parse("(  \r\n  +\t   x\t    3\t    )"), ["+", "x", 3]);
+    });		
+    test('parse("  (  +   1   (  f   x   3   y  )  )")', function() {
+		assert.deepEqual(SCHEEM.parse("( \r\n + \r\n  1   (\r\n   f\t    x\r\n    3\r\n     y\t  )  \t )"), ["+", 1, ["f", "x", 3, "y"]]);
+    });	
+});
+
+suite('parser quotes', function() {
+    test('parse("\'x")', function() {
+		assert.deepEqual(SCHEEM.parse("'x"), ["qoute", "x"]);
+    });
+    test('parse("\'  x")', function() {
+		assert.deepEqual(SCHEEM.parse("'   x"), ["qoute", "x"]);
+    });	
+    test('parse("\'(1 2 3))', function() {
+		assert.deepEqual(SCHEEM.parse("'(1 2 3)"), ["qoute", [1, 2, 3]]);
+    });		
+});
+
+suite('parser comments', function() {
+    test('parse(";;comment\natom")', function() {
+		assert.deepEqual(SCHEEM.parse(";;comment\natom"), "atom");
+    });
+    test('parse(";;comment\natom;;comment\n")', function() {
+		assert.deepEqual(SCHEEM.parse(";;comment\natom;;comment\n"), "atom");
+    });
+    test('parse(";;comment\natom;;comment")', function() {
+		assert.deepEqual(SCHEEM.parse(";;comment\natom;;comment"), "atom");
+    });
+    test('parse(";;comment\n(a b);;comment")', function() {
+		assert.deepEqual(SCHEEM.parse(";;comment\n(a b);;comment"), ["a", "b"]);
+    });
+    test('parse(";;comment\n(a ;;comment)b;;comment\n")', function() {
+		assert.deepEqual(SCHEEM.parse(";;comment\n(a ;;comment\nb;;comment\n)"), ["a", "b"]);
+    });	
+	
+    test('commments at beggining', function() {
+		assert.deepEqual(SCHEEM.parse(";;comment\n;;comment\n(a b c d)"), ["a", "b", "c", "d"]);
+    });
+    test('commments at end', function() {
+		assert.deepEqual(SCHEEM.parse("(a b c d);;comment\n"), ["a", "b", "c", "d"]);
+    });
+    test('commments at end no newline', function() {
+		assert.deepEqual(SCHEEM.parse("(a b c d);;comment"), ["a", "b", "c", "d"]);
+    });
+    test('commments after first element', function() {
+		assert.deepEqual(SCHEEM.parse("(a;;comment\n   \n  ;;comment\n b c d);;comment"), ["a", "b", "c", "d"]);
+    });	
+	
+	test('commments after second element', function() {
+		assert.deepEqual(SCHEEM.parse("(a b;;comment\n   \n  ;;comment\n  c d);;comment"), ["a", "b", "c", "d"]);
+    });
+    test('commments before closing', function() {
+		assert.deepEqual(SCHEEM.parse("(a b c d ;;comment\n)"), ["a", "b", "c", "d"]);
+    });
+    test('commments before closing no space', function() {
+		assert.deepEqual(SCHEEM.parse("(a b c d;;comment\n)"), ["a", "b", "c", "d"]);
+    });
+    test('commments everywhere', function() {
+		assert.deepEqual(SCHEEM.parse(";;comment\n;;comment\n(;;comment\n;;comment\n  ;;comment\n;;comment\na ;;comment\n   b\n;;comment\n\nc \n;;comment d)\n;;comment\n   ;;comment\n\n\n\nd \n;;comment\n)\n;;comment\n;;comment\n"), ["a", "b", "c", "d"]);
+    });	
 });
 
 suite('evalScheemString', function() {
