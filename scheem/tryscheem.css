@@ -1,0 +1,70 @@
+@CHARSET "ISO-8859-1";
+
+#main {
+	width: 90%;
+	height: 50%;
+	border: 1px solid black;
+	
+}
+
+#main thead tr {
+	height: 2em;
+}
+#main thead tr th {
+	text-align: left;
+	padding:0px 10px 0px 10px;	
+	
+}
+
+.message{
+	width: 90%;		
+	padding: 0px 0px 0px 60px;
+	font-size: 0.8em;
+	
+}
+.rowsmall {
+	min-height: 2em;
+}
+
+.rowbig {
+	height: 100%;
+}
+
+.spanenv {
+	margin-left: 100px;
+}
+#env{
+	overflow: auto;
+	font-family: monospace;
+	font-size: 1.2em;
+	width:500px;
+}
+
+#columnlogheader {
+	width: 25%;
+}
+
+#columncodeheader {
+	width: 50%;
+}
+
+tr {
+	font-size: .8em;
+}
+
+td {
+	padding: 0px 10px 0px 10px;	
+}
+
+textarea {
+	width: 100%;
+	height: 95%;
+	overflow: auto;
+	font-family: monospace;
+	font-size: 1.2em;
+	margin-top: 0px;
+}
+
+#log {
+	background-color: #f0f0f0;
+}
