@@ -12,8 +12,10 @@
   </script>
   <script src="http://nathansuniversity.com/js/mocha.js">
   </script>
+  <script src="parser.js"></script>
   <script>mocha.setup('tdd')</script>
   <script>
+  
 var expect = chai.expect;    
 var assert = chai.assert;
 
@@ -544,12 +546,52 @@ suite('minor', function(){
 	});	
 });
 
+suite('parse', function() {
+    test('a number', function() {
+        assert.deepEqual(
+            SCHEEM.parse('42'),
+            42
+        );
+    });
+    test('a variable', function() {
+        assert.deepEqual(
+            SCHEEM.parse('x'),
+            'x'
+        );
+    });
+});
 
+suite('evalScheemString', function() {
+    test('a number', function() {
+        assert.deepEqual(
+            evalScheemString('42', {}),
+            42
+        );
+    });
+    test('a variable', function() {
+        assert.deepEqual(
+            evalScheemString('x', {x:33}),
+            33
+        );
+    });
+    test('an operation with variables', function() {
+        assert.deepEqual(
+            evalScheemString('(+ x y)', {x:2, y:3}),
+            5
+        );
+    });	
+});
   </script>
   <script>
     $(function(){
       mocha.run();
     });
+  </script>
+  <script>
+	function evalScheemString(code, env){
+	var ast = SCHEEM.parse(code);
+	return evalScheem(ast, env);
+	}
   </script>
 </head>
 <body>

@@ -5,7 +5,10 @@ validchar
     = [0-9a-zA-Z_?!+\-=@#$%^&*/.]
 
 atom = chars:validchar+
-       { return chars.join(""); }
+       { 
+       var text = chars.join(""); 
+       return isNaN(text) ? text :  Number(text);
+       }
 
 space = ' ' / '\n' / '\r'  / '\t'
 
