@@ -1,5 +1,9 @@
 @CHARSET "ISO-8859-1";
 
+body{
+	height: 100%;
+}
+
 #main {
 	width: 90%;
 	height: 80%;
@@ -54,6 +58,11 @@ tr {
 
 td {
 	padding: 0px 10px 0px 10px;	
+	height: 100%;
+}
+
+tbody{
+	height: 100%;
 }
 
 #sample{
@@ -78,6 +87,7 @@ textarea {
 	overflow: auto;
 	font-family: monospace;
 	font-size: 1.2em;
+	display:block;
 	margin-top: 0px;
 }
 

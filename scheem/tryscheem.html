@@ -1,17 +1,14 @@
-<!-- This comment will put IE 6, 7 and 8 in quirks mode -->
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 	<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-	<meta name="description" content="Try Scheem fake programming language here right now." />
-	<meta name="keywords" content="Scheem online edit run code try test" />
-	<link rel="stylesheet" href="base.css" type="text/css" media="screen, projection" />
-	<link rel="stylesheet" href="tryscheem.css" type="text/css" media="screen, projection" />
-	<title>tryScheem</title>
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js" type="text/javascript"></script>
-	<script src="parser.js"></script>
-	<script src="interpreter.js"></script>
+		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+		<meta name="description" content="Try Scheem fake programming language here right now." />
+		<meta name="keywords" content="Scheem online edit run code try test" />
+		<link rel="stylesheet" href="base.css" type="text/css" media="screen, projection" />
+		<link rel="stylesheet" href="tryscheem.css" type="text/css" media="screen, projection" />
+		<title>tryScheem</title>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js" type="text/javascript"></script>
+		<script src="parser.js"></script>
+		<script src="interpreter.js"></script>
 	</head>
 <body>
 	<h3>tryScheem</h3><span id = "showHideHelp" >Show/Hide Help</span>
@@ -20,7 +17,7 @@
 			Scheem is a dialect of lisp, or better a crippled-scheme-like language I'm developing thanks to the excellent <a href="http://nathansuniversity.com">http://nathansuniversity.com/ </a><br/>
 			Currently only a very strict subset of scheme is supported, there is not even lambda yet!<br/>
 			Right now you can use:<br/>
-			&nbsp;&nbsp;&nbsp;comments, starting with ;; to the end of the line
+			&nbsp;&nbsp;&nbsp;comments, starting with ;; to the end of the line<br/>
 			&nbsp;&nbsp;&nbsp;basic arithmethic ( + - * /) but only two elements at a time<br/>
 			&nbsp;&nbsp;&nbsp;equality ( = ) and minor ( < ) comparations) ,two elements at a time<br/>
 			&nbsp;&nbsp;&nbsp;quote and if<br/>
@@ -41,7 +38,7 @@
 	 )
   )
 )</textarea><br/>
-			press run and see what happens!
+			press F9 and see what happens!
 		</div>
 		<thead>
 			<tr>
@@ -52,8 +49,8 @@
 
 		<tbody>
 			<tr class="rowbig">
-				<td id="cellcode"><textarea id="code"></textarea></td>
-				<td><textarea readonly="readonly" id="log" ></textarea></td>				
+				<td id="cellcode"><textarea id="code" cols="3" rows="3"></textarea></td>
+				<td><textarea readonly="readonly" id="log" cols="3" rows="3"></textarea></td>				
 			</tr>
 			<tr class="rowsmall">
 				<td><input type="button" id="focus" value="Focus F8"
