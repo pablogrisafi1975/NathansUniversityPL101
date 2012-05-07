@@ -14,20 +14,34 @@
 	<script src="interpreter.js"></script>
 	</head>
 <body>
-	<h3>tryScheem</h3>
+	<h3>tryScheem</h3><span id = "showHideHelp" >Show/Hide Help</span>
 	<table id="main">		
-		<div class="message">
-		Scheem is a dialect of lisp, or better a crippled-scheme-like language I'm developing thanks to the excellent <a href="http://nathansuniversity.com">http://nathansuniversity.com/ </a><br/>
-		Currently only a very strict subset of scheme is supported, there is not even lambda yet!<br/>
-		Right now you can use:<br/>
-		&nbsp;&nbsp;&nbsp;comments, starting with ;; to the end of the line
-		&nbsp;&nbsp;&nbsp;basic arithmethic ( + - * /) but only two elements at a time<br/>
-		&nbsp;&nbsp;&nbsp;equality ( = ) and minor ( < ) comparations) ,two elements at a time<br/>
-		&nbsp;&nbsp;&nbsp;quote and if<br/>
-		&nbsp;&nbsp;&nbsp;basic list operations: 'cons', 'cdr', 'car'<br/>
-		&nbsp;&nbsp;&nbsp;'define' new variables and 'set!' them (destructive assignment of existent variables)<br/>
-		&nbsp;&nbsp;&nbsp;and you must start your programs with a 'begin' to execute more than one thing<br/>
-		As an example, write 'a:3 b:[1,2,3]' in the 'env' input text, and in 'code' textarea write<br/>
+		<div id="help">
+			Scheem is a dialect of lisp, or better a crippled-scheme-like language I'm developing thanks to the excellent <a href="http://nathansuniversity.com">http://nathansuniversity.com/ </a><br/>
+			Currently only a very strict subset of scheme is supported, there is not even lambda yet!<br/>
+			Right now you can use:<br/>
+			&nbsp;&nbsp;&nbsp;comments, starting with ;; to the end of the line
+			&nbsp;&nbsp;&nbsp;basic arithmethic ( + - * /) but only two elements at a time<br/>
+			&nbsp;&nbsp;&nbsp;equality ( = ) and minor ( < ) comparations) ,two elements at a time<br/>
+			&nbsp;&nbsp;&nbsp;quote and if<br/>
+			&nbsp;&nbsp;&nbsp;basic list operations: 'cons', 'cdr', 'car'<br/>
+			&nbsp;&nbsp;&nbsp;'define' new variables and 'set!' them (destructive assignment of existent variables)<br/>
+			&nbsp;&nbsp;&nbsp;and you must start your programs with a 'begin' to execute more than one thing<br/>
+			As an example, write 'a:3, b:[1,2,3]' in the 'env' input text, and in 'code' textarea write<br/>
+			<textarea id="sample" readonly="readonly">(if (= a 2)        ;;if a == 2
+  (begin           ;;  then
+	(set! a 99)    ;;    assign 99 to a
+	(cons a b)     ;;    make a list starting with a, ending with b
+  )
+  (begin           ;;  else
+	 (define x 99) ;;    create a variable x = 99
+	 (+            ;;    sum
+	  (car b)      ;;       first element of b
+	   x           ;;       to x
+	 )
+  )
+)</textarea><br/>
+			press run and see what happens!
 		</div>
 		<thead>
 			<tr>
@@ -121,7 +135,10 @@
 						$(this).css('background-color', '#e0f0e0');
 					}).blur(function() {
 						$(this).css('background-color', 'white');
-					});					
+					});		
+					$('#showHideHelp').click(function(){
+						$('#help').toggle();
+					})	
 				});
 	</script>
 </body>

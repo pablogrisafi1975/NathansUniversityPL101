@@ -2,7 +2,7 @@
 
 #main {
 	width: 90%;
-	height: 50%;
+	height: 80%;
 	border: 1px solid black;
 	
 }
@@ -16,11 +16,11 @@
 	
 }
 
-.message{
+#help{
 	width: 90%;		
 	padding: 0px 0px 0px 60px;
 	font-size: 0.8em;
-	
+	display: none;	
 }
 .rowsmall {
 	min-height: 2em;
@@ -49,11 +49,27 @@
 }
 
 tr {
-	font-size: .8em;
+	font-size: 0.8em;
 }
 
 td {
 	padding: 0px 10px 0px 10px;	
+}
+
+#sample{
+	width: 600px;
+	height: 230px;
+	overflow: hidden;
+	font-family: monospace;
+	font-size: 1.1em;
+	margin-top: 0px;
+	margin-left: 50px;
+	border: 1px solid gray
+}
+
+#showHideHelp{
+	margin-left: 50px;	
+	background-color: yellow;
 }
 
 textarea {
