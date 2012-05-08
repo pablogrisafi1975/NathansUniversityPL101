@@ -50,7 +50,16 @@ var assert = chai.assert;
     An outer function returns an inner function, inner function refers to outer function variables done
     A function in a define that calls itself recursively done
 
-	Convert everything you can into a function that is bound in the initial environment rather than a special form. deon
+	Go through and convert everything you can into a function that is bound in the initial environment rather than a special form. Your only special forms should be:
+    variable references
+    number
+    (quote _expr)
+    (if _test _then _else)
+    (define _var _expr)
+    (set! _var _expr)
+    (lambda (_vars...) _body)
+    (begin _exprs...)
+    (_func _args...)
 
 */
 
@@ -141,19 +150,19 @@ suite ('auxiliar functions', function(){
 suite('number', function() {
     test('integer', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(3),
+            Interpreter.evalScheem(3, {bindings:{}, outer:{}}),
             3
         );
     });
     test('float', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(4.4),
+            Interpreter.evalScheem(4.4, {bindings:{}, outer:{}}),
             4.4
         );
     });
     test('negative', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(-5),
+            Interpreter.evalScheem(-5, {bindings:{}, outer:{}}),
             -5
         );
     });
@@ -162,50 +171,50 @@ suite('number', function() {
 suite('add', function() {
     test(' 2 and 2', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['+', 2, 2]),
+            Interpreter.evalScheem(['+', 2, 2], {bindings:{}, outer:{}}),
             4
         );
     });
     test('two numbers', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['+', 3, 5]),
+            Interpreter.evalScheem(['+', 3, 5], {bindings:{}, outer:{}}),
             8
         );
     });
     test('a number and an expression', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['+', 3, ['+', 2, 2]]),
+            Interpreter.evalScheem(['+', 3, ['+', 2, 2]], {bindings:{}, outer:{}}),
             7
         );
     });
 	test('a dog and a cat', function() {
 		expect(function () {
-			Interpreter.evalScheem(['+', 'dog', 'cat']);
+			Interpreter.evalScheem(['+', 'dog', 'cat'], {bindings:{}, outer:{}});
 		}).to.throw();
 	});	
 	test('a dog and 2', function() {
 		expect(function () {
-			Interpreter.evalScheem(['+', 'dog', 2]);
+			Interpreter.evalScheem(['+', 'dog', 2], {bindings:{}, outer:{}});
 		}).to.throw();
 	});		
 	test('3 and a cat', function() {
 		expect(function () {
-			Interpreter.evalScheem(['+', 3, 'cat']);
+			Interpreter.evalScheem(['+', 3, 'cat'], {bindings:{}, outer:{}});
 		}).to.throw();
 	});		
 	test('2 and a "2"', function() {
 		expect(function () {
-			Interpreter.evalScheem(['+', 2, '2']);
+			Interpreter.evalScheem(['+', 2, '2'], {bindings:{}, outer:{}});
 		}).to.throw();
 	});	
 	test('1 and a 2 and 3', function() {
 		expect(function () {
-			Interpreter.evalScheem(['+', 1, 2, 3]);
+			Interpreter.evalScheem(['+', 1, 2, 3], {bindings:{}, outer:{}});
 		}).to.throw();
 	});		
 	test('nothing to add', function() {
 		expect(function () {
-			Interpreter.evalScheem(['+']);
+			Interpreter.evalScheem(['+'], {bindings:{}, outer:{}});
 		}).to.throw();
 	});			
 })
@@ -213,19 +222,19 @@ suite('add', function() {
 suite('minus', function() {
     test(' 2 and 2', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['-', 2, 2]),
+            Interpreter.evalScheem(['-', 2, 2], {bindings:{}, outer:{}}),
             0
         );
     });
     test('two numbers', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['-', 3, 5]),
+            Interpreter.evalScheem(['-', 3, 5], {bindings:{}, outer:{}}),
             -2
         );
     });
     test('a number and an expression', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['-', 3, ['-', 2, 2]]),
+            Interpreter.evalScheem(['-', 3, ['-', 2, 2]], {bindings:{}, outer:{}}),
             3
         );
     });
@@ -234,19 +243,19 @@ suite('minus', function() {
 suite('times', function() {
     test(' 2 and 2', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['*', 2, 2]),
+            Interpreter.evalScheem(['*', 2, 2], {bindings:{}, outer:{}}),
             4
         );
     });
     test('two numbers', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['*', 3, 5]),
+            Interpreter.evalScheem(['*', 3, 5], {bindings:{}, outer:{}}),
             15
         );
     });
     test('a number and an expression', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['*', 3, ['*', 2, 2]]),
+            Interpreter.evalScheem(['*', 3, ['*', 2, 2]], {bindings:{}, outer:{}}),
             12
         );
     });
@@ -255,92 +264,84 @@ suite('times', function() {
 suite('variables', function(){
 	
     test('x test', function() {
-		var env = Interpreter.createBasicEnv({x:2, y:3, z:10});
+		var env = {bindings: {x:2, y:3, z:10}, outer:{}};
         assert.deepEqual(
             Interpreter.evalScheem('x', env),
             2
         );
     });		
     test('evaluation of define test', function(){
-		var env = Interpreter.createBasicEnv({x:2, y:3, z:10});
+		var env = {bindings: {x:2, y:3, z:10}, outer:{}};
 		var tmp = Interpreter.evalScheem(['define', 'a', 5], env);
 		assert.deepEqual(tmp, 0);
 	});	
 	test('define already defined', function() {
-		var env = Interpreter.createBasicEnv({x:2, y:3, z:10});
+		var env = {bindings: {x:2, y:3, z:10}, outer:{}};
 		expect(function () {
 			Interpreter.evalScheem(['define', 'x', 5], env);
 		}).to.throw();
 	});		
     test('define to list', function(){
-		var env = Interpreter.createBasicEnv({x:2, y:3, z:10});
+		var env = {bindings: {x:2, y:3, z:10}, outer:{}};
 		var tmp = Interpreter.evalScheem(['define', 'a', ['quote', [5, 6, 7]]], env);
-		assert.deepEqual(env.bindings.x, 2);
-		assert.deepEqual(env.bindings.y, 3);
-		assert.deepEqual(env.bindings.z, 10);
-		assert.deepEqual(env.bindings.a, [5,6,7]);
-		assert.deepEqual(env.outer, {});
+		assert.deepEqual(env, {bindings: { a: [ 5, 6, 7 ] , x: 2, y: 3, z: 10  }, outer:{}});
 	});		
 	test('define too many', function() {
-		var env = Interpreter.createBasicEnv({x:2, y:3, z:10});
+		var env = {x:2, y:3, z:10};
 		expect(function () {
 			Interpreter.evalScheem(['define', 'a', 5, 6, 7], env);
 		}).to.throw();
 	});		
  	test('define too few', function() {
-		var env = Interpreter.createBasicEnv({x:2, y:3, z:10});
+		var env = {bindings: {x:2, y:3, z:10}, outer:{}};
 		expect(function () {
 			Interpreter.evalScheem(['define', 'a'], env);
 		}).to.throw();
 	});	
 	test('set! not defined', function() {
-		var env = Interpreter.createBasicEnv({x:2, y:3, z:10});
+		var env = {bindings: {x:2, y:3, z:10}, outer:{}};
 		expect(function () {
 			Interpreter.evalScheem(['set!', 'yyyyy', 5], env);
 		}).to.throw();
 	});	
 	test('set! too many', function() {
-		var env = Interpreter.createBasicEnv({x:2, y:3, z:10});
+		var env = {bindings: {x:2, y:3, z:10}, outer:{}};
 		expect(function () {
 			Interpreter.evalScheem(['set!', 'a', 5, 6, 7], env);
 		}).to.throw();
 	});		
  	test('set! too few', function() {
-		var env = Interpreter.createBasicEnv({x:2, y:3, z:10});
+		var env = {bindings: {x:2, y:3, z:10}, outer:{}};
 		expect(function () {
 			Interpreter.evalScheem(['set!', 'a'], env);
 		}).to.throw();
 	});		
     test('(set! y (+ x 1)) test', function(){
-		var env = Interpreter.createBasicEnv({x:2, y:0, z:10});
+		var env = {bindings: {x:2, y:0, z:10}, outer:{}};
 		var tmp = Interpreter.evalScheem(['set!', 'y', ['+', 'x', 1]], env);
-		assert.deepEqual(env.bindings.x, 2);
-		assert.deepEqual(env.bindings.y, 3);
-		assert.deepEqual(env.bindings.z, 10);
-		assert.deepEqual(env.outer, {});
+		assert.deepEqual(env, {bindings:{x:2, y:3, z:10}, outer:{}});
 	});		
 })
 
 suite('begin', function(){
     test('(begin 99) test', function(){
-		assert.deepEqual(Interpreter.evalScheem(['begin', 99]), 99);
+		assert.deepEqual(Interpreter.evalScheem(['begin', 99], {bindings:{}, outer:{}}), 99);
 	});
     test('(begin 1 2 3) test', function(){
-		assert.deepEqual(Interpreter.evalScheem(['begin', 1, 2, 3]), 3);
+		assert.deepEqual(Interpreter.evalScheem(['begin', 1, 2, 3], {bindings:{}, outer:{}}), 3);
 	});
     test('(begin (+ 2 2) test', function(){
-		assert.deepEqual(Interpreter.evalScheem(['begin', ['+', 2, 2]]), 4);
+		assert.deepEqual(Interpreter.evalScheem(['begin', ['+', 2, 2]], {bindings:{}, outer:{}}), 4);
 	});	
     test('(begin x y x) test', function(){
-		var env = Interpreter.createBasicEnv({x:1});
-		assert.deepEqual(Interpreter.evalScheem(['begin', 'x', 'y', 'x'], env), 1);
+		assert.deepEqual(Interpreter.evalScheem(['begin', 'x', 'y', 'x'], {bindings:{x:1, y:2}, outer:{}}), 1);
 	});	
     test('(begin (set! x 5) (set! x (+ y x) x)) test', function(){
-		assert.deepEqual(Interpreter.evalScheem(['begin', ['set!', 'x', 5], ['set!', 'x', ['+', 'y', 'x']], 'x'], Interpreter.createBasicEnv({x:1, y:2})), 7);
+		assert.deepEqual(Interpreter.evalScheem(['begin', ['set!', 'x', 5], ['set!', 'x', ['+', 'y', 'x']], 'x'], {bindings:{x:1, y:2}, outer:{}}), 7);
 	});	
  	test('begin too few', function() {
 		expect(function () {
-			Interpreter.evalScheem(['begin']);
+			Interpreter.evalScheem(['begin'], {bindings:{}, outer:{}});
 		}).to.throw();
 	});		
 });
@@ -348,19 +349,19 @@ suite('begin', function(){
 suite('quote', function() {
     test('a number', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['quote', 3]),
+            Interpreter.evalScheem(['quote', 3], {bindings:{}, outer:{}}),
             3
         );
     });
     test('an atom', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['quote', 'dog']),
+            Interpreter.evalScheem(['quote', 'dog'], {bindings:{}, outer:{}}),
             'dog'
         );
     });
     test('a list', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['quote', [1, 2, 3]]),
+            Interpreter.evalScheem(['quote', [1, 2, 3]], {bindings:{}, outer:{}}),
             [1, 2, 3]
         );
     });
@@ -369,13 +370,13 @@ suite('quote', function() {
 suite('list operations', function(){
     test('(cons 1 \'(2 3)) test', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['cons', 1, ['quote', [2, 3]]]),
+            Interpreter.evalScheem(['cons', 1, ['quote', [2, 3]]], {bindings:{}, outer:{}}),
 			[1, 2, 3]
         );
     });
     test('(cons \'(1 2) \'(3 4)) test', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['cons', ['quote', [1, 2]], ['quote', [3, 4]]]),
+            Interpreter.evalScheem(['cons', ['quote', [1, 2]], ['quote', [3, 4]]], {bindings:{}, outer:{}}),
 			[[1, 2], 3, 4]
         );
     });	
@@ -387,73 +388,73 @@ suite('list operations', function(){
 	test('cons too many', function() {
 		var env = {x:2, y:3, z:10};
 		expect(function () {
-			Interpreter.evalScheem(['cons', 1, ['quote', [2, 3]], ['quote', [2, 3]]] )
+			Interpreter.evalScheem(['cons', 1, ['quote', [2, 3]], ['quote', [2, 3]]] , {bindings:{}, outer:{}})
 		}).to.throw();
 	});		
  	test('cons too few', function() {
 		var env = {x:2, y:3, z:10};
 		expect(function () {
-			Interpreter.evalScheem(['cons', 1])
+			Interpreter.evalScheem(['cons', 1], {bindings:{}, outer:{}})
 		}).to.throw();
 	});		
     test('(car \'((1 2) 3 4)) test', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['car', ['quote', [[1, 2], 3, 4]]]),
+            Interpreter.evalScheem(['car', ['quote', [[1, 2], 3, 4]]], {bindings:{}, outer:{}}),
 			[1, 2]
         );
     });	
  	test('car no list', function() {
 		expect(function () {
-			Interpreter.evalScheem(['car', 1]);
+			Interpreter.evalScheem(['car', 1], {bindings:{}, outer:{}});
 		}).to.throw();
 	});	
  	test('car empty list', function() {
 		expect(function () {
-			Interpreter.evalScheem(['car', []]);
+			Interpreter.evalScheem(['car', []], {bindings:{}, outer:{}});
 		}).to.throw();
 	});		
 	test('car too many', function() {
 		var env = {x:2, y:3, z:10};
 		expect(function () {
-			Interpreter.evalScheem(['car', ['quote', [2, 3]], ['quote', [2, 3]]] )
+			Interpreter.evalScheem(['car', ['quote', [2, 3]], ['quote', [2, 3]]] , {bindings:{}, outer:{}})
 		}).to.throw();
 	});		
  	test('car too few', function() {
 		var env = {x:2, y:3, z:10};
 		expect(function () {
-			Interpreter.evalScheem(['car'])
+			Interpreter.evalScheem(['car'], {})
 		}).to.throw();
 	});	
     test('(cdr \'((1 2) 3 4)) test', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['cdr', ['quote', [[1, 2], 3, 4]]]),
+            Interpreter.evalScheem(['cdr', ['quote', [[1, 2], 3, 4]]], {bindings:{}, outer:{}}),
 			[3, 4]
         );
     });
     test('(cdr \'(2)) test', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['cdr', ['quote', [2]]]),
+            Interpreter.evalScheem(['cdr', ['quote', [2]]], {bindings:{}, outer:{}}),
 			[]
         );
     });	
  	test('cdr no list', function() {
 		expect(function () {
-			Interpreter.evalScheem(['cdr', 1]);
+			Interpreter.evalScheem(['cdr', 1], {bindings:{}, outer:{}});
 		}).to.throw();
 	});	
  	test('cdr empty list', function() {
 		expect(function () {
-			Interpreter.evalScheem(['cdr', []]);
+			Interpreter.evalScheem(['cdr', []], {bindings:{}, outer:{}});
 		}).to.throw();
 	});	
 	test('cdr too many', function() {
 		expect(function () {
-			Interpreter.evalScheem(['cdr', ['quote', [2, 3]], ['quote', [2, 3]]] )
+			Interpreter.evalScheem(['cdr', ['quote', [2, 3]], ['quote', [2, 3]]] , {bindings:{}, outer:{}})
 		}).to.throw();
 	});		
  	test('cdr too few', function() {
 		expect(function () {
-			Interpreter.evalScheem(['cdr'])
+			Interpreter.evalScheem(['cdr'], {bindings:{}, outer:{}})
 		}).to.throw();
 	});		
 });	
@@ -461,56 +462,56 @@ suite('list operations', function(){
 suite('equal and if', function(){
     test('(if (= 1 1) 2 3) test', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['if', ['=', 1, 1], 2, 3]), 2
+            Interpreter.evalScheem(['if', ['=', 1, 1], 2, 3], {bindings:{}, outer:{}}), 2
         );
     });
 	test('equal too many', function() {
 		expect(function () {
-			Interpreter.evalScheem(['=', 1, 2, 4] )
+			Interpreter.evalScheem(['=', 1, 2, 4] , {bindings:{}, outer:{}})
 		}).to.throw();
 	});		
  	test('equal too few', function() {
 		expect(function () {
-			Interpreter.evalScheem(['='])
+			Interpreter.evalScheem(['='], {bindings:{}, outer:{}})
 		}).to.throw();
 	});		
 	
     test('(if (= 1 0) 2 3) test', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['if', ['=', 1, 0], 2, 3]), 3
+            Interpreter.evalScheem(['if', ['=', 1, 0], 2, 3], {bindings:{}, outer:{}}), 3
         );
     });	
 	
     test('(if (= 1 1) 2 error) test', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['if', ['=', 1, 1], 2, 'error']), 2
+            Interpreter.evalScheem(['if', ['=', 1, 1], 2, 'error'], {bindings:{}, outer:{}}), 2
         );
     });		
 	
     test('(if (= 1 1) error 3) test', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['if', ['=', 1, 0], 'error', 3]), 3
+            Interpreter.evalScheem(['if', ['=', 1, 0], 'error', 3], {bindings:{}, outer:{}}), 3
         );
     });		
 	
     test('(if (= 1 1) (if (= 2 3) 10 11) 12) test', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['if', ['=', 1, 1], ['if', ['=', 2, 3], 10, 11], 12]), 11
+            Interpreter.evalScheem(['if', ['=', 1, 1], ['if', ['=', 2, 3], 10, 11], 12], {bindings:{}, outer:{}}), 11
         );
     });		
 	test('if too many', function() {
 		expect(function () {
-			 Interpreter.evalScheem(['if', ['=', 1, 0], 2, 3, 4])
+			 Interpreter.evalScheem(['if', ['=', 1, 0], 2, 3, 4], {bindings:{}, outer:{}})
 		}).to.throw();
 	});		
  	test('if too few', function() {
 		expect(function () {
-			 Interpreter.evalScheem(['if', ['=', 1, 0], 2])
+			 Interpreter.evalScheem(['if', ['=', 1, 0], 2], {bindings:{}, outer:{}})
 		}).to.throw();
 	});
 	test('if not boolean', function() {
 		expect(function () {
-			 Interpreter.evalScheem(['if', 4444, 2, 3])
+			 Interpreter.evalScheem(['if', 4444, 2, 3], {bindings:{}, outer:{}})
 		}).to.throw();
 	});		
 });
@@ -518,37 +519,37 @@ suite('equal and if', function(){
 suite('minor', function(){
     test('(< 2 2) test', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['<', 2, 2]), '#f'
+            Interpreter.evalScheem(['<', 2, 2], {bindings:{}, outer:{}}), '#f'
         );
     });
     test('(< 2 3) test', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['<', 2, 3]), '#t'
+            Interpreter.evalScheem(['<', 2, 3], {bindings:{}, outer:{}}), '#t'
         );
     });	
     test('(< (+ 1 1) (+ 2 3)) test', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['<', ['+', 1, 1], ['+', 2, 3]]), '#t'
+            Interpreter.evalScheem(['<', ['+', 1, 1], ['+', 2, 3]], {bindings:{}, outer:{}}), '#t'
         );
     });		
 	test('minor too many', function() {
 		expect(function () {
-			 Interpreter.evalScheem(['<', 2, 3, 4])
+			 Interpreter.evalScheem(['<', 2, 3, 4], {bindings:{}, outer:{}})
 		}).to.throw();
 	});		
  	test('minor too few', function() {
 		expect(function () {
-			 Interpreter.evalScheem(['<', 2])
+			 Interpreter.evalScheem(['<', 2], {bindings:{}, outer:{}})
 		}).to.throw();
 	});
  	test('minor not numeric', function() {
 		expect(function () {
-			 Interpreter.evalScheem(['<', 2 , 'dog'])
+			 Interpreter.evalScheem(['<', 2 , 'dog'], {bindings:{}, outer:{}})
 		}).to.throw();
 	});	
  	test('minor not numeric', function() {
 		expect(function () {
-			 Interpreter.evalScheem(['<', 'dog', 3])
+			 Interpreter.evalScheem(['<', 'dog', 3], {bindings:{}, outer:{}})
 		}).to.throw();
 	});	
 });
@@ -558,31 +559,30 @@ suite('function application', function(){
  	test('function 1 argument', function() {	
 		var functionPlusOne = function(a){return a + 1;};
         assert.deepEqual(
-            Interpreter.evalScheem(['functionPlusOne', 1], Interpreter.createBasicEnv({'functionPlusOne': functionPlusOne})), 2);
+            Interpreter.evalScheem(['functionPlusOne', 1], {bindings:{'functionPlusOne': functionPlusOne}, outer:{}}), 2);
 	});	
  	test('function 0 argument', function() {	
 		var functionAlways3 = function(){return 3;};
         assert.deepEqual(
-            Interpreter.evalScheem(['functionAlways3'], Interpreter.createBasicEnv({'functionAlways3': functionAlways3})), 3);
+            Interpreter.evalScheem(['functionAlways3'], {bindings:{'functionAlways3': functionAlways3}, outer:{}}), 3);
 	});		
  	test('function 4 argument', function() {	
 		var functionSum4 = function(a, b , c , d){return a + b + c + d;};
         assert.deepEqual(
-            Interpreter.evalScheem(['functionSum4', 1, 2, 3, 4], Interpreter.createBasicEnv({'functionSum4': functionSum4})), 10);
+            Interpreter.evalScheem(['functionSum4', 1, 2, 3, 4], {bindings:{'functionSum4': functionSum4}, outer:{}}), 10);
 	});			
 });
 
 suite('lambda-one', function(){
 	test('a function gets created', function(){
-		//(define plusone (lambda (x) (+ x 1)))
-		var env = Interpreter.createBasicEnv();
+		var env = {bindings:{}, outer:{}}; //(define plusone (lambda (x) (+ x 1)))
 		Interpreter.evalScheem(['define', 'plusone', ['lambda-one', 'x', ['+', 'x', 1]]], env);
 		var functionPlusOne = env.bindings['plusone'];
 		assert.deepEqual(typeof functionPlusOne, 'function');	
 		assert.deepEqual(functionPlusOne(5), 6);
 	})
 	test('identity', function(){
-		var env = Interpreter.createBasicEnv();
+		var env = {bindings:{}, outer:{}}; 
 		Interpreter.evalScheem(['define', 'identity', ['lambda-one', 'x', 'x']], env);
 		var functionIdentity = env.bindings['identity'];
 		assert.deepEqual(typeof functionIdentity, 'function');	
@@ -590,26 +590,26 @@ suite('lambda-one', function(){
 	})	
  	test('lambda-one too few', function() {
 		expect(function () {
-			 Interpreter.evalScheem(['lambda-one', 'x'])
+			 Interpreter.evalScheem(['lambda-one', 'x'], {bindings:{}, outer:{}})
 		}).to.throw();
 	});	
  	test('lambda-one too many', function() {
 		expect(function () {
-			 Interpreter.evalScheem(['lambda-one', 'x', ['x'], [3]])
+			 Interpreter.evalScheem(['lambda-one', 'x', ['x'], [3]], {bindings:{}, outer:{}})
 		}).to.throw();
 	});		
 });
 
 suite('lambda', function(){
 	test('a function gets created', function(){
-		var env = Interpreter.createBasicEnv();//(define plusone (lambda (x) (+ x 1)))
+		var env = {bindings:{}, outer:{}}; //(define plusone (lambda (x) (+ x 1)))
 		Interpreter.evalScheem(['define', 'add2', ['lambda', ['x', 'y'], ['+', 'x', 'y']]], env);
 		var add2 = env.bindings['add2'];
 		assert.deepEqual(typeof add2, 'function');	
 		assert.deepEqual(add2(5, 6), 11);
 	})
 	test('identity', function(){
-		var env = Interpreter.createBasicEnv();
+		var env = {bindings:{}, outer:{}}; 
 		Interpreter.evalScheem(['define', 'identity', ['lambda', ['x'], 'x']], env);
 		var functionIdentity = env.bindings['identity'];
 		assert.deepEqual(typeof functionIdentity, 'function');	
@@ -631,57 +631,63 @@ suite('lambda', function(){
 		}).to.throw();
 	});		
 	test('Calling an anonymous function', function(){
-		var result = Interpreter.evalScheem([['lambda', ['x', 'y'], ['+', 'x', 'y']], 5 , 6]);
+		var env = {bindings:{}, outer:{}}; 
+		var result = Interpreter.evalScheem([['lambda', ['x', 'y'], ['+', 'x', 'y']], 5 , 6], env);
 		assert.deepEqual(result, 11);
 	});
 	test('Passing a function as a value to another function', function(){
+		var env = {bindings:{}, outer:{}}; 
 		var result = Interpreter.evalScheem(['begin', 
 			['define', 'add2', ['lambda', ['x', 'y'], ['+', 'x', 'y']]],
 			['define', 'apply', ['lambda', ['f', 'a', 'b'], ['f', 'a', 'b']]],
 			['apply', 'add2', 3, 4]			
-			]);
+			], env);
 
 		assert.deepEqual(result, 7);
 	});	
 	test('Argument to a function shadows a global variable', function(){
-		var env = Interpreter.createBasicEnv({x:1, y:2}); 
+		var env = {bindings:{x:1, y:2}, outer:{}}; 
 		var result = Interpreter.evalScheem([['lambda', ['x', 'y'], ['+', 'x', 'y']], 5 , 6], env);
 		assert.deepEqual(result, 11);
 	});	
 	
 	test('function reads a global variable', function(){
-		var env = Interpreter.createBasicEnv({x:1, y:2}); 
+		var env = {bindings:{x:1, y:2}, outer:{}}; 
 		var result = Interpreter.evalScheem([['lambda', ['y'], ['+', 'x', 'y']], 5], env);
 		assert.deepEqual(result, 6);
 	});	
 
 	test('A function modifies a global variable', function(){
-		var env = Interpreter.createBasicEnv({x:1, y:2}); 
+		var env = {bindings:{x:1, y:2}, outer:{}}; 
 		Interpreter.evalScheem([['lambda', ['x'], ['set!', 'y', 33]], 5], env);
 		assert.deepEqual(env.bindings.y, 33);
 	});		
 	test('Inner function uses values from enclosing function', function(){
-		var result = Interpreter.evalScheem([['lambda', ['x'], [['lambda', ['y'], ['+', 'x', 'y']], 3]], 5]);
+		var env = {bindings:{}, outer:{}}; 
+		var result = Interpreter.evalScheem([['lambda', ['x'], [['lambda', ['y'], ['+', 'x', 'y']], 3]], 5], env);
 		assert.deepEqual(result, 8);
 	});		
 	test('An inner function modifies a variable in the outer function', function(){
-		var result = Interpreter.evalScheem([['lambda', ['x'], ['begin', [['lambda', ['y'], ['set!', 'x', 'y']], 3], 'x']], 5]);
+		var env = {bindings:{}, outer:{}}; 
+		var result = Interpreter.evalScheem([['lambda', ['x'], ['begin', [['lambda', ['y'], ['set!', 'x', 'y']], 3], 'x']], 5], env);
 		assert.deepEqual(result, 3);
 	});		
 	
 	test('An outer function returns an inner function', function(){
-		var result = Interpreter.evalScheem([['lambda', [], ['lambda', ['y'], ['+', 'y', 8]]]]);
+		var env = {bindings:{}, outer:{}}; 
+		var result = Interpreter.evalScheem([['lambda', [], ['lambda', ['y'], ['+', 'y', 8]]]], env);
 		assert.deepEqual(typeof result, 'function');	
 		assert.deepEqual(result(1), 9);
 	});		
 	
 	test('An outer function returns an inner function, inner function refers to outer function variables', function(){
-		var result = Interpreter.evalScheem(['lambda', ['x'], [['lambda', ['y'], ['+', 'x', 'y']], 3]]);
+		var env = {bindings:{}, outer:{}}; 
+		var result = Interpreter.evalScheem(['lambda', ['x'], [['lambda', ['y'], ['+', 'x', 'y']], 3]], env);
 		assert.deepEqual(typeof result, 'function');	
 		assert.deepEqual(result(5), 8);
 	});		
 	test(' A function in a define that calls itself recursively', function(){
-		var env = Interpreter.createBasicEnv(); 
+		var env = {bindings:{}, outer:{}}; 
 		Interpreter.evalScheem(['define', 'fact', 
 		['lambda', ['n'], [
 			'if', ['=', 0, 'n'],
@@ -819,19 +825,19 @@ suite('parser comments', function() {
 suite('evalScheemString', function() {
     test('a number', function() {
         assert.deepEqual(
-            Interpreter.evalScheemString('42'),
+            Interpreter.evalScheemString('42', {}),
             42
         );
     });
     test('a variable', function() {
         assert.deepEqual(
-            Interpreter.evalScheemString('x', Interpreter.createBasicEnv({x:33})),
+            Interpreter.evalScheemString('x', {bindings:{x:33}, outer:{}}),
             33
         );
     });
     test('an operation with variables', function() {
         assert.deepEqual(
-            Interpreter.evalScheemString('(+ x y)', Interpreter.createBasicEnv({x:2, y:3})),
+            Interpreter.evalScheemString('(+ x y)', {bindings:{x:2, y:3}, outer:{}}),
             5
         );
     });	

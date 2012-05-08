@@ -93,6 +93,7 @@
 						var env = $('#env').val();
 						try{
 							env = eval("({" + env + "})");
+							env = Interpreter.createBasicEnv(env);
 						}catch (error) {
 							log("Error parsing env: " + error);
 							envOk = false;
@@ -100,7 +101,7 @@
 						if(envOk){
 						var code = $('#code').val();
 							try {
-								log(evalScheemString(code, env));
+								log(Interpreter.evalScheemString(code, env));
 							} catch (error) {
 								log("Error parsing code:" + error);
 							}

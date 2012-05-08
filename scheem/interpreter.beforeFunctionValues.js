@@ -1,94 +1,11 @@
 var Interpreter = {
 
-	createBasicEnv : function(bindings){
-		if(!this.isDefined(bindings)){
-			bindings = {};
-		}
-		bindings['+'] = function(a, b){
-				validateTwoNumbers(arguments);
-				return a + b;
-			};
-		bindings['-'] = function(a, b){
-				validateTwoNumbers(arguments);
-				return a - b;
-			};
-		bindings['*'] = function(a, b){
-				validateTwoNumbers(arguments);
-				return a * b;
-			};
-		bindings['/'] = function(a, b){
-				validateTwoNumbers(arguments);
-				return a / b;
-			};			
-		bindings['car'] = function(list){
-				validateOneList(arguments);
-				return list[0];
-			};		
-		bindings['cdr'] = function(list){
-				validateOneList(arguments);
-				return list.slice(1);
-			};		
-		bindings['cons'] = function(head, tail){
-				validateLength(arguments, 2);
-				validateList(arguments, 1);
-				return [head].concat(tail);
-			};					
-		bindings['='] = function(a, b){
-				validateLength(arguments, 2);
-				return a === b ? '#t' : '#f';
-			};
-		bindings['<'] = function(a, b){
-				validateTwoNumbers(arguments);
-				return a < b ? '#t' : '#f';
-			};		
-		bindings['alert'] = function(a){
-				validateLength(arguments, 1);
-				alert(a);
-			};				
-		return {
-			outer: {},
-			bindings: bindings
-		};
-
-		function validateTwoNumbers(args){
-			validateLength(args, 2);
-			validateNumber(args, 0);
-			validateNumber(args, 1);
-		}
-		
-		function validateOneList(args){
-			validateLength(args, 1);
-			validateList(args, 0);
-		}
-		
-		function validateLength(args, length){
-			if(args.length != length){
-				throw new Error(args + ' must have ' + length + ' operands');
-			}
-		}
-		
-		function validateNumber(args, index){
-			if (typeof args[index] !== 'number' ){
-				throw new Error('value: ' + args[index] + ' is not a number' );
-			}			
-		}
-		function validateList(args, index){
-			if(!Array.isArray(args[index])){
-				throw new Error(args[index] + ' should be a list');
-			}
-		}			
-		
-	},
-
 	evalScheemString : function (code, env){
 		var ast = SCHEEM.parse(code);
 		return this.evalScheem(ast, env);
 	},
 	
 	evalScheem : function (expr, env) {
-		if(!this.isDefined(env)){
-			env = this.createBasicEnv();
-		}
 
 		// Numbers evaluate to themselves
 		if (typeof expr === 'number') {
@@ -99,6 +16,23 @@ var Interpreter = {
 		}	
 		// Look at head of list for operation
 		switch (expr[0]) {
+			case '+':
+			case '-':
+			case '*':
+			case '/':
+				this.validateExprSize(expr, 3);			
+				var a = this.validateExprIsNumeric(expr, 1, env);
+				var b = this.validateExprIsNumeric(expr, 2, env);
+				switch(expr[0]){
+					case '+':
+						return a + b;
+					case '-':
+						return a - b;
+					case '*':
+						return a * b;
+					case '/':
+						return a / b;  			
+				}
 			case 'define':
 				this.validateExprSize(expr, 3);
 				var oldValue = this.lookup(env, expr[1]);
@@ -124,11 +58,32 @@ var Interpreter = {
 					result =  this.evalScheem(expr[i], env);
 				}
 				return result;			
+			case 'cons':
+				this.validateExprSize(expr, 3);		
+				var list = this.validateExprIsList(expr, 2, env);
+				return [this.evalScheem(expr[1], env)].concat(list);			
+			case 'car':
+				this.validateExprSize(expr, 2);		
+				var list = this.validateExprIsList(expr, 1, env);
+				return list[0];  
+			case 'cdr':
+				this.validateExprSize(expr, 2);		
+				var list = this.validateExprIsList(expr, 1, env);		
+				return list.slice(1);      
+			case '=':
+				this.validateExprSize(expr, 3);		
+				var areEqual = (this.evalScheem(expr[1], env) === this.evalScheem(expr[2], env));
+				return areEqual ? '#t' :'#f';
 			case 'if':
 				this.validateExprSize(expr, 4);		
 				var result = this.evalScheem(expr[1], env);
 				this.validateBoolean(result);
 				return result === '#t' ? this.evalScheem(expr[2], env) : this.evalScheem(expr[3], env);
+			case '<':
+				this.validateExprSize(expr, 3);	
+				var a = this.validateExprIsNumeric(expr, 1, env);
+				var b = this.validateExprIsNumeric(expr, 2, env);			
+				return  a < b ? '#t' : '#f';   			
 			case 'quote':
 				return expr[1];
 			case 'lambda-one':
