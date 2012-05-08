@@ -42,7 +42,7 @@ SCHEEM = (function(){
         "space": parse_space,
         "program": parse_program,
         "expression": parse_expression,
-        "qoutedExpression": parse_qoutedExpression,
+        "quotedExpression": parse_quotedExpression,
         "unquotedExpression": parse_unquotedExpression,
         "emptyList": parse_emptyList,
         "spaceExpression": parse_spaceExpression,
@@ -246,14 +246,14 @@ SCHEEM = (function(){
       function parse_expression() {
         var result0;
         
-        result0 = parse_qoutedExpression();
+        result0 = parse_quotedExpression();
         if (result0 === null) {
           result0 = parse_unquotedExpression();
         }
         return result0;
       }
       
-      function parse_qoutedExpression() {
+      function parse_quotedExpression() {
         var result0, result1, result2;
         var pos0, pos1;
         
@@ -292,7 +292,7 @@ SCHEEM = (function(){
           pos = pos1;
         }
         if (result0 !== null) {
-          result0 = (function(offset, ex) {return ['qoute', ex];})(pos0, result0[2]);
+          result0 = (function(offset, ex) {return ['quote', ex];})(pos0, result0[2]);
         }
         if (result0 === null) {
           pos = pos0;

@@ -762,13 +762,13 @@ suite('parser enters and tabs', function() {
 
 suite('parser quotes', function() {
     test('parse("\'x")', function() {
-		assert.deepEqual(SCHEEM.parse("'x"), ["qoute", "x"]);
+		assert.deepEqual(SCHEEM.parse("'x"), ["quote", "x"]);
     });
     test('parse("\'  x")', function() {
-		assert.deepEqual(SCHEEM.parse("'   x"), ["qoute", "x"]);
+		assert.deepEqual(SCHEEM.parse("'   x"), ["quote", "x"]);
     });	
     test('parse("\'(1 2 3))', function() {
-		assert.deepEqual(SCHEEM.parse("'(1 2 3)"), ["qoute", [1, 2, 3]]);
+		assert.deepEqual(SCHEEM.parse("'(1 2 3)"), ["quote", [1, 2, 3]]);
     });		
 });
 
@@ -833,6 +833,12 @@ suite('evalScheemString', function() {
         assert.deepEqual(
             Interpreter.evalScheemString('(+ x y)', Interpreter.createBasicEnv({x:2, y:3})),
             5
+        );
+    });	
+    test('a quote', function() {
+        assert.deepEqual(
+            Interpreter.evalScheemString('\'dog'),
+            'dog'
         );
     });	
 });

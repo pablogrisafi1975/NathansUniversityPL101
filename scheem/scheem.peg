@@ -15,10 +15,10 @@ space = ' ' / '\n' / '\r'  / '\t'
 program =  nonCodeBlock? ex:expression nonCodeBlock? endcomment?
     {return ex}
 
-expression = (qoutedExpression / unquotedExpression) 
+expression = (quotedExpression / unquotedExpression) 
 
-qoutedExpression = "'" space* ex:expression
-     {return ['qoute', ex];}
+quotedExpression = "'" space* ex:expression
+     {return ['quote', ex];}
 
 unquotedExpression = emptyList / expressionList / atom
 
