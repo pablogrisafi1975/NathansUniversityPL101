@@ -44,6 +44,7 @@ var Interpreter = {
 		bindings['alert'] = function(a){
 				validateLength(arguments, 1);
 				alert(a);
+				return 0;
 			};				
 		return {
 			outer: {},
