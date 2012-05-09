@@ -20,11 +20,11 @@ body{
 	
 }
 
-#help{
-	width: 90%;		
-	padding: 0px 0px 0px 60px;
-	font-size: 0.8em;
-	display: none;	
+.jqmClose{
+	font-size: 1.3em;
+	font-weight: normal;
+	color: blue;
+	float:right;
 }
 .rowsmall {
 	min-height: 2em;
@@ -36,6 +36,10 @@ body{
 
 .spanenv {
 	margin-left: 100px;
+}
+.showExamplesScroll{
+	overflow:scroll;
+	max-height: 85%;
 }
 #env{
 	overflow: auto;
@@ -65,10 +69,10 @@ tbody{
 	height: 100%;
 }
 
-#sample{
+.exampleCode{
 	width: 600px;
 	height: 230px;
-	overflow: hidden;
+	overflow: auto;
 	font-family: monospace;
 	font-size: 1.1em;
 	margin-top: 0px;
@@ -76,7 +80,7 @@ tbody{
 	border: 1px solid gray
 }
 
-#showHideHelp{
+.menu{
 	margin-left: 50px;	
 	background-color: yellow;
 }

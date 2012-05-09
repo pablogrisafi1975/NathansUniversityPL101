@@ -35,21 +35,50 @@ var Interpreter = {
 			};					
 		bindings['='] = function(a, b){
 				validateLength(arguments, 2);
-				return a === b ? '#t' : '#f';
+				return scheemBoolean(a === b);
 			};
 		bindings['<'] = function(a, b){
 				validateTwoNumbers(arguments);
-				return a < b ? '#t' : '#f';
+				return scheemBoolean(a < b);
 			};		
 		bindings['alert'] = function(a){
 				validateLength(arguments, 1);
 				alert(a);
-				return 0;
+			};	
+		bindings['log'] = function(a){
+				validateLength(arguments, 1);
+				if(window && window.log){
+				    log(a);
+				}else if(window && window.console && window.console.log){
+					console.log(a);
+				}
 			};				
+		bindings['length'] = function(list){
+			validateOneList(arguments);
+			return list.length;
+		}		
+		bindings['isEmpty?'] = function(list){
+			validateOneList(arguments);
+			return scheemBoolean(list.length === 0);
+		}	
+		bindings['isList?'] = function(list){
+			validateLength(arguments, 1);
+			return scheemBoolean(Array.isArray(list));
+		}			
+		bindings['append'] = function(list1, list2){
+			validateLength(arguments, 2);
+			validateList(arguments, 0);
+			validateList(arguments, 1);
+			return list1.concat(list2);
+		}		
 		return {
 			outer: {},
 			bindings: bindings
 		};
+		
+		function scheemBoolean(b){
+			return b ? '#t' : '#f';
+		}
 
 		function validateTwoNumbers(args){
 			validateLength(args, 2);

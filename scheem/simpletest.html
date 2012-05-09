@@ -700,6 +700,112 @@ suite('lambda', function(){
 	});	
 });
 
+suite('more functions', function(){
+	test('length of empty list', function(){
+		var result = Interpreter.evalScheem(['length', ['quote', []]]);
+		assert.deepEqual(result, 0);
+	});	
+	test('length of list 1 2 3 4', function(){
+		var result = Interpreter.evalScheem(['length', ['quote', [1,2,3,4]]]);
+		assert.deepEqual(result, 4);
+	});	
+ 	test('length args shoud be a list', function() {
+		expect(function () {
+			 Interpreter.evalScheem(['length', 3]);
+		}).to.throw();
+	});		
+ 	test('length too few', function() {
+		expect(function () {
+			 Interpreter.evalScheem(['length']);
+		}).to.throw();
+	});	
+ 	test('length too many', function() {
+		expect(function () {
+			 Interpreter.evalScheem(['length', ['quote', [1]], ['quote', [1,2]]]);
+		}).to.throw();
+	});		
+	
+	test('isEmpty? of empty list', function(){
+		var result = Interpreter.evalScheem(['isEmpty?', ['quote', []]]);
+		assert.deepEqual(result, '#t');
+	});	
+	test('isEmpty? of list 1 2 3 4', function(){
+		var result = Interpreter.evalScheem(['isEmpty?', ['quote', [1,2,3,4]]]);
+		assert.deepEqual(result, '#f');
+	});	
+ 	test('isEmpty? args shoud be a list', function() {
+		expect(function () {
+			 Interpreter.evalScheem(['isEmpty?', 3]);
+		}).to.throw();
+	});		
+ 	test('isEmpty? too few', function() {
+		expect(function () {
+			 Interpreter.evalScheem(['isEmpty?']);
+		}).to.throw();
+	});	
+ 	test('isEmpty? too many', function() {
+		expect(function () {
+			 Interpreter.evalScheem(['isEmpty?', ['quote', [1]], ['quote', [1,2]]]);
+		}).to.throw();
+	});	
+	
+	test('append of two lists', function(){
+		var result = Interpreter.evalScheem(['append', ['quote', [1,2]], ['quote', [3,4]]]);
+		assert.deepEqual(result, [1,2,3,4]);
+	});	
+	test('append of list and empty', function(){
+		var result = Interpreter.evalScheem(['append', ['quote', [1,2]], ['quote', []]]);
+		assert.deepEqual(result, [1,2]);
+	});	
+	test('append of empty and list', function(){
+		var result = Interpreter.evalScheem(['append', ['quote', []], ['quote', [3,4]]]);
+		assert.deepEqual(result, [3,4]);
+	});		
+ 	test('append args shoud be lists', function() {
+		expect(function () {
+			 var result = Interpreter.evalScheem(['append', 2, ['quote', [3,4]]]);
+		}).to.throw();
+	});		
+ 	test('append args shoud be lists 2', function() {
+		expect(function () {
+			 var result = Interpreter.evalScheem(['append', ['quote', [3,4]]], 3);
+		}).to.throw();
+	});	
+ 	test('append too few', function() {
+		expect(function () {
+			 Interpreter.evalScheem(['append', ['quote', [1]]]);
+		}).to.throw();
+	});	
+ 	test('append too many', function() {
+		expect(function () {
+			 Interpreter.evalScheem(['append', ['quote', [1]], ['quote', [1,2]], ['quote', [1]]]);
+		}).to.throw();
+	});		
+	
+	test('isList? of empty list', function(){
+		var result = Interpreter.evalScheem(['isList?', ['quote', []]]);
+		assert.deepEqual(result, '#t');
+	});	
+	test('isList? of list 1 2 3 4', function(){
+		var result = Interpreter.evalScheem(['isList?', ['quote', [1,2,3,4]]]);
+		assert.deepEqual(result, '#t');
+	});	
+	test('isList? of 3', function(){
+		var result = Interpreter.evalScheem(['isList?', ['quote', 3]]);
+		assert.deepEqual(result, '#f');
+	});	
+ 	test('isList? too few', function() {
+		expect(function () {
+			 Interpreter.evalScheem(['isList?']);
+		}).to.throw();
+	});	
+ 	test('isList? too many', function() {
+		expect(function () {
+			 Interpreter.evalScheem(['isList?', ['quote', [1]], ['quote', [1,2]]]);
+		}).to.throw();
+	});		
+})
+
 suite('parser smoke test', function() {
     test('a number', function() {
         assert.deepEqual(
