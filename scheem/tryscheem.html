@@ -13,45 +13,77 @@
 		<script src="jqModal.js"></script>
 	</head>
 <body>
-	<h3>tryScheem</h3>
-	<span id = "showHelp" class="menu" >Help!</span><span id = "showExamples" class="menu" >Examples!</span>
+	<h1>tryScheem</h1>
+	<span id = "showIntro" class="menu" >Intro</span><span id = "showHelp" class="menu" >Help</span><span id = "showExamples" class="menu" >Examples</span>
 	<table id="main">		
-		<div id="help" class="jqmWindow">		
-			<h3>Help</h3>
-			<hr/>
-			Scheem is a dialect of lisp, or better a crippled-scheme-like language I'm developing thanks to the excellent <a href="http://nathansuniversity.com">http://nathansuniversity.com/ </a><br/>
-			Currently only a very strict subset of scheme is supported, there is not even lambda yet!<br/>
-			Right now you can use:<br/>
-			&nbsp;&nbsp;&nbsp;comments, starting with ;; to the end of the line<br/>
-			&nbsp;&nbsp;&nbsp;basic arithmethic ( + - * /) but only two elements at a time<br/>
-			&nbsp;&nbsp;&nbsp;equality ( = ) and minor ( < ) comparations) ,two elements at a time<br/>
-			&nbsp;&nbsp;&nbsp;quote and if<br/>
-			&nbsp;&nbsp;&nbsp;basic list operations: 'cons', 'cdr', 'car'<br/>
-			&nbsp;&nbsp;&nbsp;'define' new variables and 'set!' them (destructive assignment of existent variables)<br/>
-			&nbsp;&nbsp;&nbsp;and you must start your programs with a 'begin' to execute more than one thing<br/>
-			As an example, in the 'env' input text write <br/>
-			'a:3, b:[1,2,3]'<br/>
-			and in 'code' textarea write<br/><br/>
-			<textarea class="exampleCode" readonly="readonly">(if (= a 2)        ;;if a == 2
+		<div id="intro" class="jqmWindow">		
+			<div class="jqmWindowTitle">
+				Intro <a href="#" class="jqmClose">Close</a>
+			</div>
+			<div class="jqmWindowScroll">
+				Scheem is a dialect of lisp, or better a crippled-scheme-like language I'm developing thanks to the excellent <a href="http://nathansuniversity.com">http://nathansuniversity.com/ </a><br/>
+				Currently only a very limited subset of scheme is supported.<br/>
+				As an example, in the 'env' input text write <br/>
+				<br/>
+				<input class = "exampleEnv" value="a:3, b:[1,2,3]" readonly = "readonly"><br/>
+				<br/>
+				and in 'code' textarea write<br/>
+				<br/>
+				<textarea class="exampleCode" readonly="readonly">(if (= a 2)        ;;if a == 2
   (begin           ;;  then
-	(set! a 99)    ;;    assign 99 to a
-	(cons a b)     ;;    make a list starting with a, ending with b
+    (set! a 99)    ;;    assign 99 to a
+    (cons a b)     ;;    make a list starting with a, ending with b
   )
   (begin           ;;  else
-	 (define x 99) ;;    create a variable x = 99
-	 (+            ;;    sum
-	  (car b)      ;;       first element of b
-	   x           ;;       to x
-	 )
+    (define x 99)  ;;    create a variable x = 99
+    (+             ;;    sum
+      car b)       ;;       first element of b
+      x            ;;       to x
+    )
   )
-)</textarea><br/><br/>
-			press F9 and see what happens!<br/>
-			See more examples clicking the "Examples" menu!!<br/>
-			<a href="#" class="jqmClose">Close</a>
+)</textarea><br/>
+				<br/>
+				press F9 and see what happens!<br/>
+				See the list of iomplekented functions in "Help" menu.<br/>
+				See more examples clicking the "Examples" menu<br/>
+			</div>
+			
 		</div>
+		<div id="help" class="jqmWindow">		
+			<div class="jqmWindowTitle">
+				Help <a href="#" class="jqmClose">Close</a>
+			</div>
+			<div class="jqmWindowScroll">
+				Currently only a very limited subset of scheme is supported.<br/>
+				<ul>					
+					<li>comments, starting with ;; to the end of the line</li>
+					<li>true and false are #t and #t</li>
+					<li>basic arithmethic operations : +, - * /  but only two elements at a time</li>
+					<li>equality ( =  one_thing another_thing) and less-than ( <  one_number another_number) comparators</li>
+					<li>quote a list like '(1 2 3 4) so it is not executed as a function call</li>
+					<li>basic list operations: cons, cdr, car, append (only qorks with two lists)</li>
+					<li>(isEmpty? list) returns #t if the list is emtpy (doh!)</li>
+					<li>(isList? x) returns #t if the X is a list (doh!)</li>
+					<li>(length list) returns the lenght of the list (doh!)</li>
+					<li>(define variable_name variable_value) creates a new variables</li>
+					<li>(set! variable_name variable_value) reassigns an existing variable</li>
+					<li>(begin list) executes everything on the list and returns the last value</li>
+					<li>(alert something) shows a popup, so please don't use it</li>
+					<li>(log something) shows a textual representation in the log window</li>
+					<li>(lambda-one variable (function)) returns a function with just one variable</li>
+					<li>(lambda (variable_list) (function)) returns a function with many variables</li>					
+				</ul>
+				<br/>
+				Most functions validate the type and number of arguments.<br/>
+				Define does not give you any shortcut to avoid calling lambda if you want to create a function.<br/>
+				The return of your program is always logged.<br/>
+			</div>
+		</div>		
 		<div id="examples" class="jqmWindow">
-			<h3>Examples</h3>
-			<div class="showExamplesScroll">
+			<div class="jqmWindowTitle">
+				Examples <a href="#" class="jqmClose">Close</a>
+			</div>
+			<div class="jqmWindowScroll">
 				<h4>Factorial</h4>
 				<textarea class="exampleCode" readonly="readonly">;;Factorial:
 (begin (define fact (lambda (n) (
@@ -66,7 +98,7 @@
   (log (fact 0))
   (log (fact 1))
   (log (fact 4))
-  (log 'finished)
+  'finished
 )</textarea><br/>
 				<h4>Fibonacci</h4>
 				<textarea class="exampleCode" readonly="readonly">;;Fibonacci:
@@ -88,7 +120,7 @@
   (log (fib 2))
   (log (fib 3))
   (log (fib 8))
-  (log 'finished)
+  'finished
 )</textarea><br/>
 	<h4>Reverse</h4>
 				<textarea class="exampleCode" readonly="readonly">;;Reverse:
@@ -110,7 +142,7 @@
   (log (reverse '(1 2 3)))
   (log (reverse '(1)))
   (log	(reverse '()))
-  (log	'finished)
+  'finished
 )</textarea><br/>
 <h4>isPresent?</h4>
 				<textarea class="exampleCode" readonly="readonly">;;isPresent?:
@@ -132,7 +164,7 @@
   (log (isPresent? 3 '()))
   (log (isPresent? 2 '(1 2 3)))
   (log (isPresent? 4 '(1 2 3)))
-  (log 'finished)
+  'finished
 )</textarea><br/>
 <h4>apply</h4>
 				<textarea class="exampleCode" readonly="readonly">;;apply
@@ -156,7 +188,7 @@
   )
   (log (apply plusOne '()))
   (log (apply plusOne '(1 2 3)))
-  (log 'finished)
+  'finished
 )</textarea><br/>
 <h4>flatten</h4>
 				<textarea class="exampleCode" readonly="readonly">;;flatten
@@ -185,11 +217,9 @@
   (log (flatten '(1 2 3)))
   (log (flatten '((101 102 103) 2 3)))
   (log (flatten '((1 2 3) 4 (5 6 (7 8 (9 10))))))
-  (log 'finished)
+  'finished
 )</textarea><br/><br/>
 			</div>			
-			<a href="#" class="jqmClose">Close</a>
-			
 		</div>				
 		<thead>
 			<tr>
@@ -287,6 +317,7 @@
 					});		
 					$('#help').jqm({modal: true, trigger: '#showHelp'})
 					$('#examples').jqm({modal: true, trigger: '#showExamples'})
+					$('#intro').jqm({modal: true, trigger: '#showIntro'})
 				});
 	</script>
 </body>
