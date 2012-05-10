@@ -1,113 +1,207 @@
 var Interpreter = {
+	validator: {
+
+		validateTwoNumbers: function (args, operation){
+			this.validateLength(args, 2, operation);
+			this.validateNumber(args, 0, operation);
+			this.validateNumber(args, 1, operation);
+		},
+		
+		validateOneList: function (args, operation){
+			this.validateLength(args, 1, operation);
+			this.validateList(args, 0, operation);
+		},
+		
+		validateLength: function (args, length, operation){
+			if(args.length !== length){
+				var msg = 'Can not execute ' + operation + 
+					' because needs exactly ' + length + 
+					' operands and it has ' + args.length + '.';
+				if(	args.length > 0){
+					var array = Array.prototype.slice.call(args, 0);
+					var strToError = this.toStringForError(array, false);
+					if(args.length == 1){
+						msg += ' It is ' + strToError.substr(1, strToError.length - 2) + '.';					
+					}else{
+						msg += ' They are ' + strToError.substr(1, strToError.length - 2) + '.';					
+					}
+				}
+				throw new Error(msg);
+			}
+		},
+		
+		validateMinLength: function (args, length, operation){
+			if(args.length < length){
+				var msg = 'Can not execute ' + operation + 
+					' because needs a minimun of ' + length + 
+					' operands and it has ' + args.length + '.';
+				if(	args.length > 0){
+					var array = Array.prototype.slice.call(args, 0);
+					var strToError = this.toStringForError(array, false);
+					if(args.length == 1){
+						msg += ' It is ' + strToError.substr(1, strToError.length - 2) + '.';					
+					}else{
+						msg += ' They are ' + strToError.substr(1, strToError.length - 2) + '.';					
+					}
+				}
+				throw new Error(msg);
+			}
+		},		
+		
+		validateNumber: function (args, index, operation){
+			if (typeof args[index] !== 'number' ){
+				throw new Error('Can not execute ' + operation + 
+				' because value in position ' + (index  + 1) + 
+				' is not a number. It is ' + this.toStringForError(args[index], true) + '.');
+			}			
+		},
+		
+		validateBoolean: function (arg, index, operation){
+			if (typeof arg !== 'boolean' ){
+				throw new Error('Can not execute ' + operation + 
+				' because value in position ' + (index  + 1) + 
+				' is not a boolean. It is ' + this.toStringForError(arg, true) + '.');
+			}			
+		},		
+		
+		validateList: function (args, index, operation){
+			if(!Array.isArray(args[index])){
+				throw new Error('Can not execute ' + operation + 
+					' because value in position ' + (index  + 1) + 
+					' is not a list. It is ' + this.toStringForError(args[index], true) + '.');
+			}
+		},			
+		
+		toStringForError: function (a, includeDescription){
+			//Can be string, number, list, emptylist, undefined, function
+			if(typeof a === 'string'){
+				if(includeDescription){
+					return 'a string: ' + a;
+				}else{
+					return "'" + a + "'";
+				}	
+			}
+			else if(typeof a === 'number'){
+				if(includeDescription){
+					return 'a number: ' + a;
+				}else{
+					return a;
+				}
+			}
+			else if(typeof a === 'boolean'){
+				if(includeDescription){
+					return 'a boolean: ' + a;
+				}else{
+					return a;
+				}
+			}			
+			else if(typeof a === 'undefined'){
+				return 'undefined';
+			}
+			
+			else if(typeof a === 'function'){
+				if(includeDescription){
+					return 'a function';
+				}else{
+					return 'function';
+				}	
+			}			
+			else if(Array.isArray(a)){
+				if(a.length == 0){
+					return 'an empty list';
+				}else{
+					var str = '[';
+					for(var i = 0; i < a.length; i++){
+						str += this.toStringForError(a[i], false) + ', '
+					}
+					str = str.substr(0, str.length - 2) + ']';
+					if(includeDescription){
+						return 'a list: ' + str;
+					}else{
+						return str;
+					}
+				}
+			}
+		}	
+	
+	},
 
 	createBasicEnv : function(bindings){
+		var validator = this.validator;
 		if(!this.isDefined(bindings)){
 			bindings = {};
 		}
 		bindings['+'] = function(a, b){
-				validateTwoNumbers(arguments);
-				return a + b;
-			};
+			validator.validateTwoNumbers(arguments, '+');
+			return a + b;
+		};
 		bindings['-'] = function(a, b){
-				validateTwoNumbers(arguments);
-				return a - b;
-			};
+			validator.validateTwoNumbers(arguments, '-');
+			return a - b;
+		};
 		bindings['*'] = function(a, b){
-				validateTwoNumbers(arguments);
-				return a * b;
-			};
+			validator.validateTwoNumbers(arguments, '*');
+			return a * b;
+		};
 		bindings['/'] = function(a, b){
-				validateTwoNumbers(arguments);
-				return a / b;
-			};			
+			validator.validateTwoNumbers(arguments, '/');
+			return a / b;
+		};			
 		bindings['car'] = function(list){
-				validateOneList(arguments);
-				return list[0];
-			};		
+			validator.validateOneList(arguments, 'car');
+			return list[0];
+		};		
 		bindings['cdr'] = function(list){
-				validateOneList(arguments);
-				return list.slice(1);
-			};		
+			validator.validateOneList(arguments, 'cdr');
+			return list.slice(1);
+		};		
 		bindings['cons'] = function(head, tail){
-				validateLength(arguments, 2);
-				validateList(arguments, 1);
-				return [head].concat(tail);
-			};					
+			validator.validateLength(arguments, 2, 'cons');
+			validator.validateList(arguments, 1, 'cons')
+			return [head].concat(tail);
+		};					
 		bindings['='] = function(a, b){
-				validateLength(arguments, 2);
-				return scheemBoolean(a === b);
-			};
+			validator.validateLength(arguments, 2, '=');
+			return a === b;
+		};
 		bindings['<'] = function(a, b){
-				validateTwoNumbers(arguments);
-				return scheemBoolean(a < b);
-			};		
+			validator.validateTwoNumbers(arguments, '<');
+			return a < b;
+		};		
 		bindings['alert'] = function(a){
-				validateLength(arguments, 1);
-				alert(a);
-			};	
+			validator.validateLength(arguments, 1, 'alert');
+			alert(a);
+		};	
 		bindings['log'] = function(a){
-				validateLength(arguments, 1);
-				if(window && window.log){
-				    log(a);
-				}else if(window && window.console && window.console.log){
-					console.log(a);
-				}
-			};				
+			validator.validateLength(arguments, 1, 'log');
+			if(window && window.log){
+			    log(a);
+			}else if(window && window.console && window.console.log){
+				console.log(a);
+			}
+		};				
 		bindings['length'] = function(list){
-			validateOneList(arguments);
+			validator.validateOneList(arguments, 'length');
 			return list.length;
 		}		
 		bindings['isEmpty?'] = function(list){
-			validateOneList(arguments);
-			return scheemBoolean(list.length === 0);
+			validator.validateOneList(arguments, 'isEmpty?');
+			return list.length === 0;
 		}	
 		bindings['isList?'] = function(list){
-			validateLength(arguments, 1);
-			return scheemBoolean(Array.isArray(list));
+			validator.validateLength(arguments, 1, 'isList?');
+			return Array.isArray(list);
 		}			
 		bindings['append'] = function(list1, list2){
-			validateLength(arguments, 2);
-			validateList(arguments, 0);
-			validateList(arguments, 1);
+			validator.validateLength(arguments, 2, 'append');
+			validator.validateList(arguments, 0, 'append');
+			validator.validateList(arguments, 1, 'append');
 			return list1.concat(list2);
 		}		
 		return {
 			outer: {},
 			bindings: bindings
 		};
-		
-		function scheemBoolean(b){
-			return b ? '#t' : '#f';
-		}
-
-		function validateTwoNumbers(args){
-			validateLength(args, 2);
-			validateNumber(args, 0);
-			validateNumber(args, 1);
-		}
-		
-		function validateOneList(args){
-			validateLength(args, 1);
-			validateList(args, 0);
-		}
-		
-		function validateLength(args, length){
-			if(args.length != length){
-				throw new Error(args + ' must have ' + length + ' operands');
-			}
-		}
-		
-		function validateNumber(args, index){
-			if (typeof args[index] !== 'number' ){
-				throw new Error('value: ' + args[index] + ' is not a number' );
-			}			
-		}
-		function validateList(args, index){
-			if(!Array.isArray(args[index])){
-				throw new Error(args[index] + ' should be a list');
-			}
-		}			
-		
 	},
 
 	evalScheemString : function (code, env){
@@ -119,9 +213,14 @@ var Interpreter = {
 		if(!this.isDefined(env)){
 			env = this.createBasicEnv();
 		}
+		var validator = this.validator;
 
 		// Numbers evaluate to themselves
 		if (typeof expr === 'number') {
+			return expr;
+		}
+		// Booleans are booleans
+		if(typeof expr === 'boolean'){
 			return expr;
 		}
 		if (typeof expr === 'string') {
@@ -130,39 +229,41 @@ var Interpreter = {
 		// Look at head of list for operation
 		switch (expr[0]) {
 			case 'define':
-				this.validateExprSize(expr, 3);
+				validator.validateLength(expr.slice(1), 2, 'define');
 				var oldValue = this.lookup(env, expr[1]);
 				if(this.isDefined(oldValue)){
-					throw new Error(expr[1] + ' already defined' );
+					throw new Error('Can not execute define ' +
+						' because variable named ' + expr[1] + 
+						' already has a value. It is ' + validator.toStringForError(oldValue, true) + '.');
 				}
 				this.add_binding(env, expr[1], this.evalScheem(expr[2], env));
 				return 0;
 			case 'set!':
-				this.validateExprSize(expr, 3);			
+				validator.validateLength(expr.slice(1), 2, 'set!');
 				var oldValue = this.lookup(env, expr[1]);
 				if(!this.isDefined(oldValue)){
-					throw new Error(expr[1] + ' not defined' );
+					throw new Error('Can not execute set! ' +
+						' because variable named ' + expr[1] + 
+						' doesn\'t has a value.');
 				}		
 				this.update(env, expr[1], this.evalScheem(expr[2], env));
 				return 0;  
 			case 'begin':    
-				if(expr.length < 2){
-					throw new Error(expr + ' must have at least one extra element');
-				}		
+				validator.validateMinLength(expr.slice(1), 1, 'begin');	
 				var result = 0;
 				for(var i = 1; i < expr.length; i++){
 					result =  this.evalScheem(expr[i], env);
 				}
 				return result;			
 			case 'if':
-				this.validateExprSize(expr, 4);		
+				validator.validateLength(expr.slice(1), 3, 'if');
 				var result = this.evalScheem(expr[1], env);
-				this.validateBoolean(result);
-				return result === '#t' ? this.evalScheem(expr[2], env) : this.evalScheem(expr[3], env);
+				validator.validateBoolean(result, 2, 'if');
+				return result ? this.evalScheem(expr[2], env) : this.evalScheem(expr[3], env);
 			case 'quote':
 				return expr[1];
 			case 'lambda-one':
-				this.validateExprSize(expr, 3);	
+				validator.validateLength(expr.slice(1), 2, 'lambda-one');
 				var that = this;
 				return function(arg) {
 					var newEnv = {bindings:{}, outer:env};
@@ -171,10 +272,8 @@ var Interpreter = {
 					return that.evalScheem(expr[2], newEnv);
 				};	
 			case 'lambda':
-				this.validateExprSize(expr, 3);	
-				if(!Array.isArray(expr[1])){
-					throw new Error(expr[1] + ' should be a list');
-				}
+				validator.validateLength(expr.slice(1), 2, 'lambda');
+				validator.validateList(expr.slice(1), 0, 'lambda');				
 				var that = this;
 				return function(arg) {
 					var newEnv = {bindings:{}, outer:env};
@@ -186,6 +285,9 @@ var Interpreter = {
 				};				
 			default: //evaluation!
 				var fun =  this.evalScheem(expr[0], env);
+				if(!this.isDefined(fun)){
+				    throw Error('Can not find a function like ' + expr[0] + '.');
+				}
 				var args = [];
 				for(var i = 1; i < expr.length; i++){
 				    args.push(this.evalScheem(expr[i], env))
@@ -193,35 +295,7 @@ var Interpreter = {
 				return fun.apply(null, args);
 		}
 	},
-	
-	validateExprSize : function(expr, expectedLength){
-		if(expr.length !== expectedLength){
-			throw new Error(expr + ' must have ' + (expectedLength - 1) + ' operands');
-		}
-	},
-	
-	validateBoolean : function(value){
-		if(value !== '#t' && value !== '#f' ){
-			throw new Error(value + ' must be #t o #f');
-		}
-	},
-	
-	validateExprIsList : function (expr, index, env){
-		var list = this.evalScheem(expr[index], env);
-		if(!Array.isArray(list)){
-			throw new Error(list + ' should be a list');
-		}
-		return list;
-	},
-	
-	validateExprIsNumeric : function(expr, index, env){
-		var number = this.evalScheem(expr[index], env);
-		if (typeof number !== 'number' ){
-			throw new Error('value: ' + number + ' is not a number' );
-		}
-		return number;
-	},
-	
+
 	lookup: function(env, v) {
 		if(!env.hasOwnProperty('bindings')){
 			return undefined;

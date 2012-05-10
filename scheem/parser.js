@@ -143,6 +143,11 @@ SCHEEM = (function(){
         if (result0 !== null) {
           result0 = (function(offset, chars) { 
                var text = chars.join(""); 
+               if(text == '#t'){
+                   return true;
+               }else if(text == '#f'){
+                  return false;
+               }
                return isNaN(text) ? text :  Number(text);
                })(pos0, result0);
         }

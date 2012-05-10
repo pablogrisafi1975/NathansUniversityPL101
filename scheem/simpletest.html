@@ -464,6 +464,11 @@ suite('equal and if', function(){
             Interpreter.evalScheem(['if', ['=', 1, 1], 2, 3]), 2
         );
     });
+    test('(if #t 2 3) test', function() {
+        assert.deepEqual(
+            Interpreter.evalScheem(['if', true, 2, 3]), 2
+        );
+    });	
 	test('equal too many', function() {
 		expect(function () {
 			Interpreter.evalScheem(['=', 1, 2, 4] )
@@ -518,17 +523,17 @@ suite('equal and if', function(){
 suite('minor', function(){
     test('(< 2 2) test', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['<', 2, 2]), '#f'
+            Interpreter.evalScheem(['<', 2, 2]), false
         );
     });
     test('(< 2 3) test', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['<', 2, 3]), '#t'
+            Interpreter.evalScheem(['<', 2, 3]), true
         );
     });	
     test('(< (+ 1 1) (+ 2 3)) test', function() {
         assert.deepEqual(
-            Interpreter.evalScheem(['<', ['+', 1, 1], ['+', 2, 3]]), '#t'
+            Interpreter.evalScheem(['<', ['+', 1, 1], ['+', 2, 3]]), true
         );
     });		
 	test('minor too many', function() {
@@ -727,11 +732,11 @@ suite('more functions', function(){
 	
 	test('isEmpty? of empty list', function(){
 		var result = Interpreter.evalScheem(['isEmpty?', ['quote', []]]);
-		assert.deepEqual(result, '#t');
+		assert.deepEqual(result, true);
 	});	
 	test('isEmpty? of list 1 2 3 4', function(){
 		var result = Interpreter.evalScheem(['isEmpty?', ['quote', [1,2,3,4]]]);
-		assert.deepEqual(result, '#f');
+		assert.deepEqual(result, false);
 	});	
  	test('isEmpty? args shoud be a list', function() {
 		expect(function () {
@@ -784,15 +789,15 @@ suite('more functions', function(){
 	
 	test('isList? of empty list', function(){
 		var result = Interpreter.evalScheem(['isList?', ['quote', []]]);
-		assert.deepEqual(result, '#t');
+		assert.deepEqual(result, true);
 	});	
 	test('isList? of list 1 2 3 4', function(){
 		var result = Interpreter.evalScheem(['isList?', ['quote', [1,2,3,4]]]);
-		assert.deepEqual(result, '#t');
+		assert.deepEqual(result, true);
 	});	
 	test('isList? of 3', function(){
 		var result = Interpreter.evalScheem(['isList?', ['quote', 3]]);
-		assert.deepEqual(result, '#f');
+		assert.deepEqual(result, false);
 	});	
  	test('isList? too few', function() {
 		expect(function () {
@@ -929,6 +934,12 @@ suite('evalScheemString', function() {
             42
         );
     });
+    test('a boolean', function() {
+        assert.deepEqual(
+            Interpreter.evalScheemString('#f'),
+            false
+        );
+    });	
     test('a variable', function() {
         assert.deepEqual(
             Interpreter.evalScheemString('x', Interpreter.createBasicEnv({x:33})),

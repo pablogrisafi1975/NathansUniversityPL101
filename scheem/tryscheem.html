@@ -152,9 +152,9 @@
      (lambda 
       (x list)
       (if (isEmpty? list) 
-        '#f
+        #f
 	 (if (= x (car list))
-           '#t
+           #t
            (isPresent? x (cdr list))
          )        
        )
@@ -276,7 +276,7 @@
 							env = eval("({" + env + "})");
 							env = Interpreter.createBasicEnv(env);
 						}catch (error) {
-							log("Error parsing env: " + error);
+							log("Error in env.\n" + error);
 							envOk = false;
 						}
 						if(envOk){
@@ -284,7 +284,7 @@
 							try {
 								log(Interpreter.evalScheemString(code, env));
 							} catch (error) {
-								log("Error parsing code:" + error);
+								log("Error in code.\n" + error);
 							}
 						}
 					});
