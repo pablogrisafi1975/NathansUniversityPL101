@@ -558,6 +558,62 @@ suite('minor', function(){
 	});	
 });
 
+suite('let-one and let', function(){
+//(let-one _var _expr _body)
+//(let-one x 2 (+ x 1)
+    test('let-one with computed value', function() {
+		var env1 = Interpreter.createBasicEnv({'x': 19});
+		var env2 = { bindings: {'y': 16}, outer: env1};
+		var env3 = { bindings: {'x': 2}, outer: env2};	
+        assert.deepEqual(
+            Interpreter.evalScheem(['let-one', 'x', ['+', 2, 2], 'x'], env3), 
+			4
+        );
+    });	
+    test('let-one with environment, inner reference', function() {
+		var env1 = Interpreter.createBasicEnv({'x': 19});
+		var env2 = { bindings: {'y': 16}, outer: env1};
+		var env3 = { bindings: {'x': 2}, outer: env2};	
+        assert.deepEqual(
+            Interpreter.evalScheem(['let-one', 'z', 7, 'z'], env3),
+			7
+        );
+    });		
+    test('let-one with environment, outer reference', function() {
+		var env1 = Interpreter.createBasicEnv({'x': 19});
+		var env2 = { bindings: {'y': 16}, outer: env1};
+		var env3 = { bindings: {'x': 2}, outer: env2};	
+        assert.deepEqual(
+            Interpreter.evalScheem(['let-one', 'x', 7, 'y'], env3),
+			16
+        );
+    });	
+	test('let-one too many', function() {
+		expect(function () {
+			 Interpreter.evalScheem(['let-one', 'x', 7, 'y', 'z'])
+		}).to.throw();
+	});		
+	test('let-one too few', function() {
+		expect(function () {
+			 Interpreter.evalScheem(['let-one', 'x', 7])
+		}).to.throw();
+	});		
+/*
+var env1 = { bindings: {'x': 19}, outer: { } };
+var env2 = { bindings: {'y': 16}, outer: env1};
+var env3 = { bindings: {'x': 2}, outer: env2};
+
+jshint(answer);
+eval(answer);
+
+
+assert_eq(evalScheem(
+    '');
+assert_eq(
+    'let-one with environment, outer reference');
+*/
+});
+
 suite('function application', function(){
 	
  	test('function 1 argument', function() {	
@@ -963,8 +1019,13 @@ suite('evalScheemString', function() {
 
   </script>
   <script>
+	function runTests(){
+	  mocha.run();
+	}
     $(function(){
-      mocha.run();
+		if(window == top) {
+		  mocha.run(); //this is not an iFrame
+		}
     });
   </script>
 

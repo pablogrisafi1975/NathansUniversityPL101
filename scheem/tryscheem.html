@@ -14,7 +14,7 @@
 	</head>
 <body>
 	<h1>tryScheem</h1>
-	<span id = "showIntro" class="menu" >Intro</span><span id = "showHelp" class="menu" >Help</span><span id = "showExamples" class="menu" >Examples</span>
+	<span id = "showIntro" class="menu" >Intro</span><span id = "showHelp" class="menu" >Help</span><span id = "showExamples" class="menu" >Examples</span><span id = "showTests" class="menu" >Tests</span>
 	<table id="main">		
 		<div id="intro" class="jqmWindow">		
 			<div class="jqmWindowTitle">
@@ -47,7 +47,6 @@
 				See the list of iomplekented functions in "Help" menu.<br/>
 				See more examples clicking the "Examples" menu<br/>
 			</div>
-			
 		</div>
 		<div id="help" class="jqmWindow">		
 			<div class="jqmWindowTitle">
@@ -220,7 +219,17 @@
   'finished
 )</textarea><br/><br/>
 			</div>			
-		</div>				
+		</div>		
+		<div id="tests" class="jqmWindow">		
+			<div class="jqmWindowTitle">
+				<span id = "testTitle">Tests </span><a href="#" class="jqmClose">Close</a>
+			</div>
+			<div class="jqmWindowScroll">
+				<iframe id = "testIframe" class="testIFrame" src="tryscheemTests.html">
+				
+				</iframe>
+			</div>
+		</div>		
 		<thead>
 			<tr>
 				<th>code <span class="spanenv"> env = {<input type = "text" id = "env"></input> }  (write something like a : 30, b : 60, c :[1 ,2 , 3 ])</span></th>
@@ -315,9 +324,26 @@
 					}).blur(function() {
 						$(this).css('background-color', 'white');
 					});		
-					$('#help').jqm({modal: true, trigger: '#showHelp'})
-					$('#examples').jqm({modal: true, trigger: '#showExamples'})
-					$('#intro').jqm({modal: true, trigger: '#showIntro'})
+					$('#help').jqm({modal: true, trigger: '#showHelp'});
+					$('#examples').jqm({modal: true, trigger: '#showExamples'});
+					$('#intro').jqm({modal: true, trigger: '#showIntro'});
+					$('#tests').jqm({modal: true, trigger: '#showTests'});
+					$('#showTests').click(function(){
+						setTimeout(function(){
+							if($('#testIframe').is(':visible')){
+								$("#testIframe")[0].src = "tryscheemTests.html";
+								setTimeout(function(){
+									$('#testIframe')[0].contentWindow.runTests();
+								}, 200);
+							}
+						}, 200);
+					});
+					$('#testTitle').click(function(){
+						$("#testIframe")[0].src = "tryscheemTests.html";
+						setTimeout(function(){
+							$('#testIframe')[0].contentWindow.runTests();
+						}, 200)					
+					})
 				});
 	</script>
 </body>

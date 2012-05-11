@@ -197,7 +197,7 @@ var Interpreter = {
 			validator.validateList(arguments, 0, 'append');
 			validator.validateList(arguments, 1, 'append');
 			return list1.concat(list2);
-		}		
+		}	
 		return {
 			outer: {},
 			bindings: bindings
@@ -254,7 +254,14 @@ var Interpreter = {
 				for(var i = 1; i < expr.length; i++){
 					result =  this.evalScheem(expr[i], env);
 				}
-				return result;			
+				return result;		
+			case 'let-one':
+				validator.validateLength(expr.slice(1), 3, 'let-one');
+				//(let-one _var _expr _body) works by evaluating _expr, binding the result to _var, then using that new environment to evaluate _body.
+				var newEnv = {bindings:{}, outer:env};
+				var argName = expr[1];				
+				this.add_binding(newEnv, expr[1], this.evalScheem(expr[2], env));		
+				return this.evalScheem(expr[3], newEnv);; 				
 			case 'if':
 				validator.validateLength(expr.slice(1), 3, 'if');
 				var result = this.evalScheem(expr[1], env);

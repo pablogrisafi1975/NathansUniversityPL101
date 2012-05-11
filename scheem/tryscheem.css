@@ -24,6 +24,15 @@ h1{
 	
 }
 
+.testIFrame{
+	border : 0px solid;
+	width: 750px;
+	height: 5000px;
+    margin: 0px;
+    padding: 0px;
+	
+}
+
 .jqmClose{
 	float:right;
 }
